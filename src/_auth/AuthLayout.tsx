@@ -9,13 +9,17 @@ const AuthLayout = () => {
   return (
     <>
       
-      {isAuthenticated ?(<Navigate to={"/"} />)
-      :(<>
+      {isAuthenticated ?(<Navigate to={"/"} />):
+      (<>
           <section className="flex flex-1 justify-center items-center flex-col py-10">
             <Outlet/>
           </section>
 
-          <img src=''/>
+          <img src="assets/icons/snowflake-side-profile.jpg" 
+          alt="side-profile"
+          className="hidden xl:block h-screen w-1/2 bg-no-repeat"
+          />
+
 
         </>
         
