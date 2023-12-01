@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form"
 import { SignUpValidation } from "@/lib/validation"
 import { z } from "zod"
 import Loader from "@/components/shared/Loader"
+import { Link } from "react-router-dom"
 
 
 const SignUpForm = () => {
@@ -97,6 +98,10 @@ const SignUpForm = () => {
                 </div>
               ): "Submit"}
           </Button>
+          <p className="text-small-regular text-light-2 text-center mt-1">
+            Already have an account?
+            <Link to='/sign-in' className="text-primary base-semibold ml-1">Log in</Link>
+          </p>
         </form>
       </div>
     </Form>
