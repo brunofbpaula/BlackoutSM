@@ -5,9 +5,12 @@ import { Button } from "@/components/ui/button"
 import { useForm } from "react-hook-form"
 import { SignUpValidation } from "@/lib/validation"
 import { z } from "zod"
+import Loader from "@/components/shared/Loader"
 
 
 const SignUpForm = () => {
+
+  const isLoading = false;
 
   const form = useForm<z.infer<typeof SignUpValidation>>({
     resolver: zodResolver(SignUpValidation),
@@ -87,7 +90,13 @@ const SignUpForm = () => {
               </FormItem>
             )}
           />
-          <Button type="submit" className="border border-white">Submit</Button>
+          <Button type="submit" className="border border-white">
+              {isLoading ?(
+                <div className="flex-center gap-2">
+                  <Loader /> Loading...
+                </div>
+              ): "Submit"}
+          </Button>
         </form>
       </div>
     </Form>
