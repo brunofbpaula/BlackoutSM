@@ -6,18 +6,27 @@ import { useForm } from "react-hook-form"
 import { SignUpValidation } from "@/lib/validation"
 import { z } from "zod"
 import Loader from "@/components/shared/Loader"
-import { Link } from "react-router-dom"
-import { createUserAccount } from "@/lib/appwrite/api"
+import { Link, useNavigate } from "react-router-dom"
 import { useToast } from "@/components/ui/use-toast"
+import { useCreateUserAccount, useSignInAccount } from "@/lib/react-query/queriesAndMutations"
+import { useUserContext } from "@/context/AuthContext"
+
 
 
 const SignUpForm = () => {
 
+  // Navigate
+  const navigate = useNavigate();
+
   // Toast
   const { toast } = useToast()
 
-  // Loading sign
-  const isLoading = false;
+  // AuthContext
+  const { checkAuthUser, isLoading: isUserLoading } = useUserContext();
+
+  // Hooks
+  const { mutateAsync: createUserAccount, isPending: isCreatingUser } = useCreateUserAccount();
+  const { mutateAsync: signInAccount, isPending: isSigningIn } = useSignInAccount();
 
   const form = useForm<z.infer<typeof SignUpValidation>>({
     resolver: zodResolver(SignUpValidation),
@@ -28,16 +37,48 @@ const SignUpForm = () => {
       password: "",
     },
   })
+
  
+/*************  ✨ Codeium Command ⭐  *************/
+/**
+ * Handles the submission of the sign-up form.
+ * 
+ * @param values - The form values validated against the SignUpValidation schema, 
+ *                 containing user information such as name, username, email, and password.
+ * 
+ * This function creates a new user account with the provided values. 
+ * If successful, it attempts to sign in the user. 
+ * If both account creation and sign-in are successful, it checks the authentication status.
+ * On successful authentication, the form is reset and the user is navigated to the home page.
+ * Displays a toast notification for any failure during the process.
+ */
+
+/******  a34ea67c-3ea5-499d-a5d2-3148508ec5ca  *******/
   async function onSubmit(values: z.infer<typeof SignUpValidation>) {
     const newUser = await createUserAccount(values);
     
     if(!newUser){
       return toast({title: "Sign up failed. Please try again."});
+    };
+
+    const session = await signInAccount({
+      email: values.email,
+      password: values.password
+    });
+
+    if(!session){
+      return toast({title: "Sign in failed. Please try again."})
+    };
+
+    const isLoggedIn = await checkAuthUser();
+
+    if(isLoggedIn){
+      form.reset();
+      navigate('/');
+    } else {
+      return toast({title: "Sign in failed. Please try again."})
     }
-
-    // const session = await signInAccount()
-
+  
   }
 
   return (
@@ -105,7 +146,7 @@ const SignUpForm = () => {
             )}
           />
           <Button type="submit" className="border border-white">
-              {isLoading ?(
+              {isCreatingUser ?(
                 <div className="flex-center gap-2">
                   <Loader /> Loading...
                 </div>
